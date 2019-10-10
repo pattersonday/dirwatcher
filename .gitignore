@@ -1,0 +1,6 @@
+.vscode/
+coverage/
+*.log
+*.txt
+/test
+.DS_STORE
