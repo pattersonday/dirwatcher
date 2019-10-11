@@ -12,7 +12,7 @@ __author__ = 'pattersonday pair programmed w/astephens91'
 """Global Variable"""
 logger = logging.getLogger(__file__)
 magic_text_position = {}
-file_list = []
+already_found_files_list = []
 exit_flag = False
 
 
@@ -20,7 +20,7 @@ def dir_watcher(args):
     """Monitor given directory and
     log when files are changed in directory"""
     global magic_text_position
-    global file_list
+    global already_found_files_list
 
     logger.info('Watching directory: {}, watching magic text: {}, '
                 'polling at this many: {}'.format(
@@ -32,31 +32,30 @@ def dir_watcher(args):
     files_inside_directory = os.listdir(absolute_path)
 
     for file in files_inside_directory:
-        if file.endswith(args.extension) and file not in file_list:
+        if file.endswith(args.extension) and file not in already_found_files_list: # NOQA (couldn't break up line)
             logger.info("Hey, this is the: {} within this: {}".format(
                 file, args.directory))
-            file_list.append(file)
+            already_found_files_list.append(file)
             magic_text_position[file] = 0
 
-    for file in file_list:
+    for file in already_found_files_list:
         if file not in files_inside_directory:
             logger.info("Hey, this: {} has been deleted".format(file))
-            file_list.remove(file)
+            already_found_files_list.remove(file)
             del magic_text_position[file]
 
-    for file in file_list:
+    for file in already_found_files_list:
         magic_text_finder(file, args.magic_text, absolute_path)
 
 
 def magic_text_finder(file_name, text_name, directory_itself):
     """Finds magic text within file"""
     global magic_text_position
-    global file_list
+    global already_found_files_list
 
     with open(directory_itself + '/' + file_name) as file:
         for line_number, current_line in enumerate(file.readlines(), 1):
-            if text_name in current_line and
-            line_number > magic_text_position[file_name]:
+            if text_name in current_line and line_number > magic_text_position[file_name]:  # NOQA (couldn't break up line)
                 logger.info("Magic text found at line: {}".format(line_number))
             if line_number > magic_text_position[file_name]:
                 magic_text_position[file_name] += 1
@@ -94,7 +93,7 @@ def create_parser():
                         metavar='', help='time interval')
     parser.add_argument('-ext', '--extension', type=str, default='.txt',
                         metavar='',
-                        help='what kind of file we to search within')
+                        help='what kind of file to search within')
 
     return parser
 
